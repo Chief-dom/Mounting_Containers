@@ -1,8 +1,8 @@
 OWNER := chief-dom
-IMAGE_NAME := dashboard
-VERSION := v1
+IMAGE_NAME := python#dashboard
+VERSION := ubuntu
 REPOSITORY := mounting_containers
-IMAGE_ID := d94e96d264e7
+IMAGE_ID := 9fec4df9860b #d94e96d264e7
 REGISTRY := chiefdom
 
 default: release
