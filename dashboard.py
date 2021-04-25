@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.style as style
 import matplotlib.pyplot as plt
 import seaborn as sns
+import json
 
 
 def main():
@@ -18,7 +19,7 @@ def main():
 
     st.title("Stock Prediction App")
 
-    stocks = ("AAPL", "GOOG", "MSFT", "TSLA")
+    stocks = ["AAPL", "GOOG", "MSFT", "TSLA"]
     selected_stock = st.selectbox("Select dataset for prediction", stocks)
 
     # n_years = st.slider("Years of prediction:", 1, 3)
@@ -48,69 +49,47 @@ def main():
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dataPrice['Date'], y=dataPrice['Open'], name='stock_open'))
         fig.add_trace(go.Scatter(x=dataPrice['Date'], y=dataPrice['Close'], name='stock_close'))
-        fig.layout.update(title_text="Time Series Data", xaxis_rangeslider_visible=True)
+        fig.layout.update(title_text="Time Series Data (TSLA)", xaxis_rangeslider_visible=True)
         st.plotly_chart(fig)
 
-
+    # print(data)
     plot_raw_data(data)
 
     train = {}
+
     # Forecasting
-    for k in stock_data.keys():
+    print('------')
+    print(type(train))
+    # train_df = pd.DataFrame()
+    data_list = []
+    for k in stocks:
+        tmp = {}
         df = stock_data[k]
         df = df[['Date', 'Close']]
         df = df.rename(columns={'Date': 'ds', 'Close': 'y'})
-        train[k] = df
-    # print(type(tmp))
-    # print(tmp)
-    print('\n------------------')
-    print('\n----formatted fisrt value')
-    print(df)
-    print('\n------------------')
-    print('\n----unformatted value')
-    # print(data)
-    print('\n------------------')
-    print('\n------------------')
-    # train_df = pd.DataFrame(data = tmp, columns=stocks)
-    print(train.keys())
-
-    text_file = open("dump_file.txt", "w")
-    for k in train.keys():
-        st.line_chart(train[k].loc[:,'y'])
-        text_file.write(str({k : train[k].values}))
-    text_file.close()
+        # print(type(df['ds']))
+        # df['ds'] = pd.to_datetime(df['ds'].apply(lambda x: x.strftime('%Y-%b-%d')))
+        tmp['ds'] = df['ds'].tolist()
+        # print(type(tmp['ds'][5]))
+        print(tmp['ds'][:5])
+        tmp['y'] = df['y'].tolist()
+        train[k] = tmp
 
 
+    train_df = pd.DataFrame(train)
+    train_df.to_json(r'./data.json')
+    print('succesful write')
 
-        # plot_raw_data(train[k])
-    #     plt.figure(figsize=(17, 5))
-    #     st.write(f'Forecast plot for {3} years')
-    #     fig1 = plot_plotly(m, forecast)
-        # st.plotly_chart(fig1)
-    #
-    #     sns.lineplot(data=train[k], x='date', y='item_cnt_month')
-    #     sns.lineplot(data=train[k], x='date', y='year_mean', color='forestgreen')
-    #     plt.legend(['item_cnt_month', 'year_average'])
+    with open("./data.json", "r") as read_file:
+        df2 = json.load(read_file)
+    print('successful read')
 
-    # m = Prophet()
-    # m.fit(df_train)
-    # future = m.make_future_dataframe(periods=period)
-    # forecast = m.predict(future)
-    #
-    # forecast_copy = forecast.copy()
-    # forecast_copy['ds'] = pd.to_datetime(forecast_copy['ds']).dt.date
-    #
-    # # Show and plot forecast
-    # st.subheader('Forecast data')
-    # st.write(forecast_copy.tail())
-    #
-    # st.write(f'Forecast plot for {n_years} years')
-    # fig1 = plot_plotly(m, forecast)
-    # st.plotly_chart(fig1)
-    #
-    # st.write("Forecast components")
-    # fig2 = m.plot_components(forecast)
-    # st.write(fig2)
+    for k in df2.keys():
+        df3 = pd.DataFrame(df2[k])
+        df3 = df3.set_index('ds')
+        st.write(k)
+        st.line_chart(df3)
+
 
 
 if __name__ == '__main__':
