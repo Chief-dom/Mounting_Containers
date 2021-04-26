@@ -1,10 +1,12 @@
+from datamover import DataMover
+from datetime import date
 # %%
 def main():
-    import datamover
-    mover = DataMover()
+    today = date.today().strftime("%Y-%m-%d")
+    mover = DataMover("2018-01-01", today)
     ticker_list = ["AAPL", "GOOG", "MSFT", "TSLA"]
-    df = load_datas(ticker_list)
-    write_json(df)
+    df = mover.load_datas(ticker_list)
+    mover.write_json(df)
 
 
 

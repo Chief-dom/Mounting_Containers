@@ -1,5 +1,11 @@
 docker run -ti --name=Container1 -v DataVolume1:/datavolume1 python:ubuntu
 >
+>
+docker run --name some-redis -d redis redis-server --appendonly yes
+docker run -it --network some-network --rm redis redis-cli -h some-redis
+docker exec -ti rdb redis-cli
+>
+>
 docker start -ai Container1
 --------
 docker run -ti --name=Container1 -v DataVolume1:/datavolume1 python:ubuntu ls datavolume1
