@@ -1,8 +1,8 @@
 OWNER := cogentdom
-IMAGE_NAME := python #dashboard
+IMAGE_NAME := python#dashboard
 VERSION := ubuntu
 REPOSITORY := mounting_containers
-IMAGE_ID := 0cdb6b5588e5 #d94e96d264e7
+IMAGE_ID := 0cdb6b5588e5#d94e96d264e7
 REGISTRY := chiefdom
 
 default: release
