@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import json
 
+
+# %%
 class DataMover:
     start = ""
     stop = ""
@@ -17,40 +19,45 @@ class DataMover:
         self.start = start
         self.stop = stop
 
-    def seaborn_style():
+    def load_data(self, ticker):
+        df = yf.download('AAPL', self.start, self.stop)
+        df.reset_index(inplace=True)
+        df['Date'] = pd.to_datetime(df['Date'])
+        return df[['Date', 'Close']]
+
+    def load_datas(self, ticker_list):
+        train = []
+        for stock in ticker_list:
+            df = self.load_data(stock)
+            date = df['Date']
+            train.append(df['Close'])
+        train_df  = pd.concat(train, axis=1)
+        train_df.columns = ticker_list
+        train_df.set_index(date, inplace=True)
+        train_df.reset_index(inplace=True)
+        return train_df
+
+    def write_json(self, df, path):
+        df.to_json(r'{}'.format(path))
+    
+    def read_json(self, path):
+        with open(path, "r") as file_ptr:
+            obj = json.load(file_ptr)
+        return obj
+    
+class ModelPlot:
+
+    def __init__(self):
         style.use('seaborn-darkgrid')
         sns.set_context('notebook')
         sns.set_palette('gist_heat')
 
-    def load_data(self, ticker):
-        df = yf.download(ticker, self.start, self.stop)
-        df.reset_index(inplace=True)
-        df['Date'] = pd.to_datetime(df['Date']).dt.date
-        return df
-
-    def load_datas(self, ticker_list):
-        stock_data = {}
-        data_load_state = st.text("Load data...")
-        train = {}
-        for stock in ticker_list:
-            data = self.load_data(stock)
-            stock_data[stock] = data
-            # df = stock_data[stock]
-            df = data[['Date', 'Close']]
-            df = df.rename(columns={'Date': 'ds', 'Close': 'y'})
-            tmp['ds'] = df['ds'].tolist()
-            print(tmp['ds'][:5])
-            tmp['y'] = df['y'].tolist()
-            train[k] = tmp
-            train_df = pd.DataFrame(train)
-        return train_df
-
-    def write_json(self, df):
-        df.to_json(r'./data.json')
-    
-    def read_json():
-        with open("./data.json", "r") as file_ptr:
-            obj = json.load(file_ptr)
-        return obj
-    
-        
+    def decomp_plot(self, df):
+        plt.figure(figsize=(17,5))
+        plt.plot(df)
+        plt.plot(df.rolling(window = 12).mean().dropna(), color='g')
+        plt.plot(df.rolling(window = 12).std().dropna(), color='blue')
+        plt.title('Rolling mean')
+        plt.legend(['item_cnt_month', 'mean', 'std'])
+     
+# %%
