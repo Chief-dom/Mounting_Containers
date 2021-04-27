@@ -70,28 +70,34 @@ import mplfinance as mpf
     # %%
     new_df.isna().count()
     data = new_df.fillna(0)
-    data['dates'] = pd.DatetimeIndex(data['dates'])
+    data.index = pd.DatetimeIndex(data.index.values,
+                               freq=
+                               None)
+    
     # %%
     new_df.dropna(inplace=True)
     
-    data.info()
     # %% 
-    mpf.plot(new_df, type='line', volume=True, style='charles')
-
+    mpf.plot(data, type='line', volume=True, style='charles')
     data.info()
+
     # %%
-    mpf.plot(new_df["2021-01-01": "2021-04-01"], figratio=(20,13), 
+    data.rename(columns={'dates': 'Date'}, inplace=True)
+    # %%
+    data
+    # %%
+    mpf.plot(new_df.drop(columns=['dates'])["2021-01-01": "2021-04-01"], figratio=(20,13), 
                     type='candle', mav=(20),tight_layout=True, 
                     volume=True, title='Apple sales from Jan 2021 to today',
                     style='yahoo')
-
-clear    # %%
+   
+    # %%
     mplot = ModelPlot()
     mplot.decomp_plot(new_df['Close'])
     # %%
-    new_df.inf(o)
+    new_df.info()
     # %%
-    mplot.plot_arima(new_df, 'Close')
+    mplot.plot_arima(data, 'Close')
     # %%
     rcParams['figure.figsize'] = 20, 24
     decomposition = sm.tsa.seasonal_decompose(data['Close'], model='additive', extrapolate_trend='freq', period=12)
