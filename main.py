@@ -1,4 +1,7 @@
 # %%
+# https://medium.com/@josemarcialportilla/using-python-and-auto-arima-to-forecast-seasonal-time-series-90877adff03c
+# https://towardsdatascience.com/arima-forecasting-in-python-90d36c2246d3
+# %%
 from datetime import date
 from datetime import datetime, timedelta
 import yfinance as yf
