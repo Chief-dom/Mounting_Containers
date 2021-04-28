@@ -55,12 +55,13 @@ class ModelPlot:
         sns.set_palette('gist_heat')
 
     def decomp_plot(self, df):
-        plt.figure(figsize=(15,10))
+        fig = plt.figure(figsize=(17,8))
         plt.plot(df)
         plt.plot(df.rolling(window = 12).mean().dropna(), color='g')
         plt.plot(df.rolling(window = 12).std().dropna(), color='blue')
         plt.title('Rolling mean')
         plt.legend(['Apple', 'mean', 'std'])
+        st.write(fig)
 
     def plot_raw_data(self, data):
         fig = go.Figure()
@@ -71,29 +72,29 @@ class ModelPlot:
 
     def plot_arima(self, df, label):
         indx = df.index
-        start = indx[-91]
+        start = indx[-20]
         end = indx[-1]
 
-        arima_model = ARIMA(df[label], order=(0,0,2)).fit()
+        arima_model = ARIMA(df[label][:-20], order=(2,3,2)).fit()
         pred = arima_model.predict(start, end, typ='levels')
         
         rolling_mean = df[label].rolling(window = 12).mean().dropna()
         rolling_std = df[label].rolling(window = 12).std().dropna()
 
-        arima_model = ARIMA(rolling_mean, order=(0,0,3)).fit()
+        arima_model = ARIMA(rolling_mean[:-20], order=(2,3,3), dates=df.index).fit()
         pred_mean = arima_model.predict(start, end, typ='levels')
 
-        arima_model = ARIMA(rolling_std, order=(0,0,3)).fit()
+        arima_model = ARIMA(rolling_std[:-20], order=(2,3,3), dates=df.index).fit()
         pred_std = arima_model.predict(start, end, typ='levels')
         
 
-        plt.figure(figsize=(17,5))
+        plt.figure(figsize=(17,8))
         plt.plot(df[label], alpha=0.5)
         plt.plot(rolling_mean, color='g', alpha=0.5)
         plt.plot(rolling_std, color='blue', alpha=0.5)
 
         # Predicted 
-        plt.plot(pred, color='r')
+        plt.plot(pred)
         plt.plot(pred_mean, color='g')
         plt.plot(pred_std, color='b')
         plt.title('Rolling mean')

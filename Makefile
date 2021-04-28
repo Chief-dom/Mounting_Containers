@@ -5,16 +5,40 @@ REPOSITORY := mounting_containers
 IMAGE_ID := 0cdb6b5588e5#d94e96d264e7
 REGISTRY := chiefdom
 
-default: release
+default: 
+	@echo 'Specify target'
 
-tag:
+new: build_new
+git: tag_git build_git publish_git
+drhub: build_drhuh publish_drhuh
+
+all: git drhub
+
+# ------ Initial build ------
+build_new: ## Build the container without caching
+	docker build -t $(IMAGE_NAME):$(VERSION) .
+
+
+# ------ Dockhub build ------
+build_drhuh: ## Build the container without caching
+	docker build -t $(REGISTRY)/$(IMAGE_NAME):$(VERSION) .
+
+# release_dh:  ## Make a release by building and publishing tagged image to Docker Trusted Registry (DTR)
+
+publish_drhuh: ## Publish image to DTR
+	@echo 'publish $(REGISTRY)$(IMAGE_NAME):$(VERSION)'
+	docker push $(REGISTRY)/$(IMAGE_NAME):$(VERSION)
+
+
+# ------ Github build ------
+tag_git:
 	docker tag $(IMAGE_ID) docker.pkg.github.com/$(OWNER)/$(REPOSITORY)/$(IMAGE_NAME):$(VERSION)
 
-build: ## Build the container forrmated for githubs api
+build_git: ## Build the container forrmated for githubs api
 	docker build -t docker.pkg.github.com/$(OWNER)/$(REPOSITORY)/$(IMAGE_NAME):$(VERSION) .
 
-release: tag build publish ## Make a release by building and publishing tagged image to Docker Trusted Registry (DTR)
+# release_git: tag_git build_git publish_git ## Make a release by building and publishing tagged image to Docker Trusted Registry (DTR)
 
-publish: ## Publish image to DTR
+publish_git: ## Publish image to DTR
 	@echo 'publish $(REGISTRY)/$(IMAGE_NAME):$(VERSION)'
 	docker push docker.pkg.github.com/$(OWNER)/$(REPOSITORY)/$(IMAGE_NAME):$(VERSION)

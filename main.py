@@ -2,6 +2,7 @@
 # https://medium.com/@josemarcialportilla/using-python-and-auto-arima-to-forecast-seasonal-time-series-90877adff03c
 # https://towardsdatascience.com/arima-forecasting-in-python-90d36c2246d3
 # %%
+import streamlit as st
 from datetime import date
 from datetime import datetime, timedelta
 import yfinance as yf
@@ -21,7 +22,12 @@ import mplfinance as mpf
 
 
 # %%
-# def main():
+def main():
+    # %%
+    style.use('seaborn-darkgrid')
+    sns.set_context('notebook')
+    sns.set_palette('gist_heat')
+    st.set_page_config(layout='wide')
     # %%
     today = date.today().strftime("%Y-%m-%d")
     mover = DataMover("2018-04-26", today)
@@ -32,58 +38,60 @@ import mplfinance as mpf
         span = end - start
         for i in range(span.days + 1):
             yield start + timedelta(days=i)
-   
     date_index = list(datetime_range(start=datetime(2018, 4, 26), end=datetime(2021, 4, 26)))
     # %%
     data.Date = pd.to_datetime(data.Date)
-    # %%
     date_index = pd.DataFrame(date_index)
-    # %%
     date_index= date_index.rename(columns= {0:"dates"})
-   # %%
-   type(date_index)
-    # %%
     data.set_index('Date', inplace=True)
     data.sort_index(inplace=True, ascending=True)
     # %%
-    thin_data = pd.merge(date_index, data, how='left', left_on='dates', right_on='Date')
-    # %%
-    data.index = pd.DatetimeIndex(data.index.values)
-    thin_data.isna().count()
-    data = thin_data.fillna(0)
-    data.index = pd.DatetimeIndex(data.index.values, freq='n')
-    # %%
-    thin_data.dropna(inplace=True)
-    thin_data.rename(columns={'dates': 'Date'}, inplace=True)
-    # thin_data.index = pd.DatetimeIndex(thin_data.index.values)
-    # %%
-    thin_data.set_index('Date', inplace=True)
-    # %% 
-    mpf.plot(thin_data, type='line', volume=True, style='charles')
-    # %%
-    data.rename(columns={'dates': 'Date'}, inplace=True)
-    # %%
-    data.reset_index(drop=True, inplace=True)
-    data.set_index('Date', inplace=True)
-    # %%
-    mpf.plot(thin_data["2021-01-01": "2021-04-01"], figratio=(20,13), 
-                    type='candle', mav=(20),tight_layout=True, 
-                    volume=True, title='Apple sales from Jan 2021 to today',
-                    style='yahoo')
+    thin_data = data.resample('2w').mean()
     # %%
     mplot = ModelPlot()
     mplot.decomp_plot(thin_data['Close'])
+    chart1 = thin_data['Close']
+    chart2 = thin_data['Close'].rolling(window = 12).mean().dropna()
+    chart3 = thin_data['Close'].rolling(window = 12).std().dropna()
     # %%
+    df = pd.concat([chart1, chart2, chart3], axis=1)
+    # %%
+    df.columns=['Close', 'Rolling Mean', 'Rolling Std']
+    # %%
+    # df
+    # %%
+    # st.line_chart([thin_data['Close'], thin_data['Close'].rolling(window = 12).mean().dropna()])
+    st.title('Rolling value decomposition on Apple stock')
+    st.line_chart(df, width=800)
 
+    col1, col2, col3 = st.beta_columns(3)
+    with col1:
+        st.line_chart(df, width=200)
+    with col2:
+        st.line_chart(df, width=200)
+    with col3:
+        st.line_chart(df, width=200)
+
+
+    # st.altair_chart([thin_data['Close'] | thin_data['Close'].rolling(window = 12).mean().dropna()])
     # %%
     mplot.plot_arima(thin_data, 'Close')
     # %%
-    rcParams['figure.figsize'] = 15, 10
-    decomposition = sm.tsa.seasonal_decompose(thin_data['Close'], model='additive', extrapolate_trend='freq', period=12)
-    decomposition.observed.plot(color='b')
+    rcParams['figure.figsize'] = 17, 12
+    decomposition = sm.tsa.seasonal_decompose(thin_data['Close'], model='additive', extrapolate_trend='freq', period=6)
+    decomposition.plot()
     plt.show()
     # %%
-    mplot.plot_raw_data(thin_data)
+    mpf.plot(thin_data["2020-04-01": "2021-04-01"], figratio=(17,8), 
+                type='candle', mav=(20), 
+                volume=True, title='Apple sales from April 2020 to April 20201')
+    # %%
+    mpf.plot(thin_data["2019-04-01": "2020-04-01"], figratio=(17,8), 
+                type='candle', mav=(20), 
+                volume=True, title='Apple sales from April 2019 to April 2020')
+    
+    # %%
+    # mplot.plot_raw_data(thin_data)
     # %%
 
 
