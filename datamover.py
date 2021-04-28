@@ -55,7 +55,7 @@ class ModelPlot:
         sns.set_palette('gist_heat')
 
     def decomp_plot(self, df):
-        plt.figure(figsize=(20,15))
+        plt.figure(figsize=(15,10))
         plt.plot(df)
         plt.plot(df.rolling(window = 12).mean().dropna(), color='g')
         plt.plot(df.rolling(window = 12).std().dropna(), color='blue')
@@ -64,35 +64,38 @@ class ModelPlot:
 
     def plot_raw_data(self, data):
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=data['Date'], y=data['AAPL'], name='Apple stock'))
-        fig.add_trace(go.Scatter(x=data['Date'], y=data['GOOG'], name='Google stock'))
+        fig.add_trace(go.Scatter(x=data.index, y=data['High'], name='Apple stock'))
+        fig.add_trace(go.Scatter(x=data.index, y=data['Low'], name='Google stock'))
         fig.layout.update(title_text="Time Series Data", xaxis_rangeslider_visible=True)
         st.plotly_chart(fig)   
 
     def plot_arima(self, df, label):
         indx = df.index
-        start = indx[-10]
-        end = indx[0]
+        start = indx[-91]
+        end = indx[-1]
 
-        arima_model = ARIMA(df[label][:-10], order=(0,0,2)).fit()
+        arima_model = ARIMA(df[label], order=(0,0,2)).fit()
         pred = arima_model.predict(start, end, typ='levels')
         
-        # arima_model = ARIMA(rolling_mean, order=(0,0,3)).fit(transparams=False)
-        # pred_mean = arima_model.predict(start, end, typ='levels')
+        rolling_mean = df[label].rolling(window = 12).mean().dropna()
+        rolling_std = df[label].rolling(window = 12).std().dropna()
 
-        # arima_model = ARIMA(rolling_std, order=(0,0,3)).fit(transparams=False)
-        # pred_std = arima_model.predict(start, end, typ='levels')
+        arima_model = ARIMA(rolling_mean, order=(0,0,3)).fit()
+        pred_mean = arima_model.predict(start, end, typ='levels')
+
+        arima_model = ARIMA(rolling_std, order=(0,0,3)).fit()
+        pred_std = arima_model.predict(start, end, typ='levels')
         
-        # rolling_mean = df[label].rolling(window = 12).mean().dropna()
-        # rolling_std = df[label].rolling(window = 12).std().dropna()
 
         plt.figure(figsize=(17,5))
         plt.plot(df[label], alpha=0.5)
-        # plt.plot(rolling_mean, color='g', alpha=0.5)
-        # plt.plot(rolling_std, color='blue', alpha=0.5)
+        plt.plot(rolling_mean, color='g', alpha=0.5)
+        plt.plot(rolling_std, color='blue', alpha=0.5)
 
         # Predicted 
         plt.plot(pred, color='r')
+        plt.plot(pred_mean, color='g')
+        plt.plot(pred_std, color='b')
         plt.title('Rolling mean')
-        # plt.legend([label, 'mean', 'std', 'predicted'])  
+        plt.legend([label, 'mean', 'std', 'predicted'])  
 # %%

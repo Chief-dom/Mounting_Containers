@@ -21,15 +21,9 @@ import mplfinance as mpf
 # def main():
     # %%
     today = date.today().strftime("%Y-%m-%d")
-    # print(today)
     mover = DataMover("2018-04-26", today)
     ticker_list = ["AAPL", "GOOG", "MSFT", "TSLA"]
     data = mover.load_data(ticker_list[0])
-    
-    # %%
-    # datelist = pd.date_range(datetime.datetime.today(), periods=100).tolist()
-    # datelist
-    data.Date.min()
     # %%
     def datetime_range(start=None, end=None):
         span = end - start
@@ -37,22 +31,8 @@ import mplfinance as mpf
             yield start + timedelta(days=i)
    
     date_index = list(datetime_range(start=datetime(2018, 4, 26), end=datetime(2021, 4, 26)))
-    
-    # %%
-    date_index[:-5]
-    
-    # %%
-    data.Date[-5:]
-    # %%
-    date_index[:-5]
-    data.head(3)
-    
-    # %%
-    date_index[-4:]
-
     # %%
     data.Date = pd.to_datetime(data.Date)
-    
     # %%
     date_index = pd.DataFrame(date_index)
     # %%
@@ -62,50 +42,45 @@ import mplfinance as mpf
     # %%
     data.set_index('Date', inplace=True)
     data.sort_index(inplace=True, ascending=True)
-
     # %%
-    date_index
+    thin_data = pd.merge(date_index, data, how='left', left_on='dates', right_on='Date')
     # %%
-    new_df = pd.merge(date_index, data, how='left', left_on='dates', right_on='Date')
+    data.index = pd.DatetimeIndex(data.index.values)
+    thin_data.isna().count()
+    data = thin_data.fillna(0)
+    data.index = pd.DatetimeIndex(data.index.values, freq='n')
     # %%
-    new_df.isna().count()
-    data = new_df.fillna(0)
-    data.index = pd.DatetimeIndex(data.index.values,
-                               freq=
-                               None)
-    
+    thin_data.dropna(inplace=True)
+    thin_data.rename(columns={'dates': 'Date'}, inplace=True)
+    # thin_data.index = pd.DatetimeIndex(thin_data.index.values)
     # %%
-    new_df.dropna(inplace=True)
-    
+    thin_data.set_index('Date', inplace=True)
     # %% 
-    mpf.plot(data, type='line', volume=True, style='charles')
-    data.info()
-
+    mpf.plot(thin_data, type='line', volume=True, style='charles')
     # %%
     data.rename(columns={'dates': 'Date'}, inplace=True)
     # %%
-    data
+    data.reset_index(drop=True, inplace=True)
+    data.set_index('Date', inplace=True)
     # %%
-    mpf.plot(new_df.drop(columns=['dates'])["2021-01-01": "2021-04-01"], figratio=(20,13), 
+    mpf.plot(thin_data["2021-01-01": "2021-04-01"], figratio=(20,13), 
                     type='candle', mav=(20),tight_layout=True, 
                     volume=True, title='Apple sales from Jan 2021 to today',
                     style='yahoo')
-   
     # %%
     mplot = ModelPlot()
-    mplot.decomp_plot(new_df['Close'])
+    mplot.decomp_plot(thin_data['Close'])
     # %%
-    new_df.info()
+
     # %%
-    mplot.plot_arima(data, 'Close')
+    mplot.plot_arima(thin_data, 'Close')
     # %%
-    rcParams['figure.figsize'] = 20, 24
-    decomposition = sm.tsa.seasonal_decompose(data['Close'], model='additive', extrapolate_trend='freq', period=12)
-    decomposition.plot()
+    rcParams['figure.figsize'] = 15, 10
+    decomposition = sm.tsa.seasonal_decompose(thin_data['Close'], model='additive', extrapolate_trend='freq', period=12)
+    decomposition.observed.plot(color='b')
     plt.show()
-    data.info()
     # %%
-    mplot.plot_raw_data(data)
+    mplot.plot_raw_data(thin_data)
     # %%
 
 
