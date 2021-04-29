@@ -24,6 +24,11 @@ import mplfinance as mpf
 # %%
 def main():
     # %%
+    # plt.style.use('ggplot')
+    # plt.rc('patch', force_edgecolor=True,edgecolor='black')
+    # plt.rc('hist', bins='auto')
+    plt.rc('patch', force_edgecolor=True,edgecolor='black')
+    plt.rc('hist', bins='auto')
     style.use('seaborn-darkgrid')
     sns.set_context('notebook')
     sns.set_palette('gist_heat')
@@ -41,39 +46,49 @@ def main():
     date_index = list(datetime_range(start=datetime(2018, 4, 26), end=datetime(2021, 4, 26)))
     # %%
     data.Date = pd.to_datetime(data.Date)
-    date_index = pd.DataFrame(date_index)
-    date_index= date_index.rename(columns= {0:"dates"})
+    # date_index = pd.DataFrame(date_index)
+    # date_index= date_index.rename(columns= {0:"dates"})
     data.set_index('Date', inplace=True)
     data.sort_index(inplace=True, ascending=True)
+    # %%
+    # thin_data
     # %%
     thin_data = data.resample('2w').mean()
     # %%
     mplot = ModelPlot()
     mplot.decomp_plot(thin_data['Close'])
-    chart1 = thin_data['Close']
-    chart2 = thin_data['Close'].rolling(window = 12).mean().dropna()
-    chart3 = thin_data['Close'].rolling(window = 12).std().dropna()
-    # %%
-    df = pd.concat([chart1, chart2, chart3], axis=1)
-    # %%
-    df.columns=['Close', 'Rolling Mean', 'Rolling Std']
-    # %%
-    # df
-    # %%
-    # st.line_chart([thin_data['Close'], thin_data['Close'].rolling(window = 12).mean().dropna()])
-    st.title('Rolling value decomposition on Apple stock')
-    st.line_chart(df, width=800)
+    
+    def tripleGraph(data):
+        chart1 = data
+        chart2 = data.rolling(window = 12).mean().dropna()
+        chart3 = data.rolling(window = 12).std().dropna()
+        # %%
+        df = pd.concat([chart1, chart2, chart3], axis=1)
+        # %%
+        df.columns=['Close', 'Rolling Mean', 'Rolling Std']
 
-    col1, col2, col3 = st.beta_columns(3)
-    with col1:
-        st.line_chart(df, width=200)
-    with col2:
-        st.line_chart(df, width=200)
-    with col3:
-        st.line_chart(df, width=200)
+        st.title('Rolling value decomposition on Apple stock')
+        st.line_chart(df, width=800)
 
+        col1, col2, col3 = st.beta_columns(3)
+        with col1:
+            st.line_chart(df['2018-04-28':'2019-04-28'], width=200)
+        with col2:
+            st.line_chart(df['2019-04-28':'2020-04-28'], width=200)
+        with col3:
+            st.line_chart(df['2020-04-28':'2021-04-28'], width=200)
 
+    tripleGraph(thin_data['Close'])
     # st.altair_chart([thin_data['Close'] | thin_data['Close'].rolling(window = 12).mean().dropna()])
+    # %%
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(y=thin_data['Close'], x=thin_data['Close'].index, name="Close"))
+    fig.add_trace(go.Scatter(y=thin_data['Open'], x=thin_data['Open'].index, name="Open"))
+    fig.add_trace(go.Scatter(y=thin_data['High'], x=thin_data['High'].index, name="High"))
+    fig.add_trace(go.Scatter(y=thin_data['Low'], x=thin_data['Low'].index, name="Low"))
+    fig.update_layout(legend_title_text='I have a title')
+
+    st.plotly_chart(fig, key="seaborn-darkgrid")
     # %%
     mplot.plot_arima(thin_data, 'Close')
     # %%

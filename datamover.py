@@ -50,18 +50,21 @@ class DataMover:
 class ModelPlot:
 
     def __init__(self):
+        # plt.style.use('ggplot')
+        plt.rc('patch', force_edgecolor=True,edgecolor='black')
+        plt.rc('hist', bins='auto')
         style.use('seaborn-darkgrid')
         sns.set_context('notebook')
         sns.set_palette('gist_heat')
 
     def decomp_plot(self, df):
-        fig = plt.figure(figsize=(17,8))
+        plt.figure(figsize=(17,8))
         plt.plot(df)
         plt.plot(df.rolling(window = 12).mean().dropna(), color='g')
         plt.plot(df.rolling(window = 12).std().dropna(), color='blue')
         plt.title('Rolling mean')
         plt.legend(['Apple', 'mean', 'std'])
-        st.write(fig)
+        # st.plotly_chart()
 
     def plot_raw_data(self, data):
         fig = go.Figure()
