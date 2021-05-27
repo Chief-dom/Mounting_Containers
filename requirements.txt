@@ -1,6 +1,7 @@
-streamlit~=0.80.0
-yfinance~=0.1.59
 pandas~=1.2.4
 seaborn~=0.11.1
-plotly
-mplfinance
+yfinance~=0.1.59
+plotly~=4.14.3
+streamlit~=0.80.0
+mplfinance~=0.12.7a17
+statsmodels~=0.12.2
