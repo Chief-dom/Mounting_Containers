@@ -100,6 +100,11 @@ def main():
     # decomposition.plot()
     fig = mplot.plot_arima(thin_data, 'Close')
     st.pyplot(fig)
+
+    # %%
+    # decomposition = sm.tsa.seasonal_decompose(thin_data['Close'], model='additive', extrapolate_trend='freq', period=6)
+    # fig = plt.plot(decomposition.trend)
+    # st.pyplot(fig)
 # %%
 if __name__ == '__main__':
     main()    
