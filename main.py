@@ -33,6 +33,8 @@ def main():
     sns.set_context('notebook')
     sns.set_palette('gist_heat')
     st.set_page_config(layout='wide')
+
+    # st.set_option('deprecation.showPyplotGlobalUse', False)
     # %%
     today = date.today().strftime("%Y-%m-%d")
     mover = DataMover("2018-04-26", today)
@@ -90,26 +92,14 @@ def main():
 
     st.plotly_chart(fig, key="seaborn-darkgrid")
     # %%
-    mplot.plot_arima(thin_data, 'Close')
+    # mplot.plot_arima(thin_data, 'Close')
+   
     # %%
-    rcParams['figure.figsize'] = 17, 12
-    decomposition = sm.tsa.seasonal_decompose(thin_data['Close'], model='additive', extrapolate_trend='freq', period=6)
-    decomposition.plot()
-    plt.show()
-    # %%
-    mpf.plot(thin_data["2020-04-01": "2021-04-01"], figratio=(17,8), 
-                type='candle', mav=(20), 
-                volume=True, title='Apple sales from April 2020 to April 20201')
-    # %%
-    mpf.plot(thin_data["2019-04-01": "2020-04-01"], figratio=(17,8), 
-                type='candle', mav=(20), 
-                volume=True, title='Apple sales from April 2019 to April 2020')
-    
-    # %%
-    # mplot.plot_raw_data(thin_data)
-    # %%
-
-
+    # fig = plt.figure()
+    # decomposition = sm.tsa.seasonal_decompose(thin_data['Close'], model='additive', extrapolate_trend='freq', period=6)
+    # decomposition.plot()
+    fig = mplot.plot_arima(thin_data, 'Close')
+    st.pyplot(fig)
 # %%
 if __name__ == '__main__':
     main()    

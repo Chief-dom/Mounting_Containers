@@ -1,7 +1,3 @@
-# Post Compile csv folders
-wrangled_data/*
-submission_files/*
-
 *.idea/
 *.ipynb_checkpoints
 *.DS_Store
