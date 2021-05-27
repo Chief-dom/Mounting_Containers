@@ -20,16 +20,12 @@ from pylab import rcParams
 from statsmodels.tsa.arima.model import ARIMA
 import mplfinance as mpf
 
-
 # %%
 def main():
     # %%
-    # plt.style.use('ggplot')
-    # plt.rc('patch', force_edgecolor=True,edgecolor='black')
-    # plt.rc('hist', bins='auto')
+    plt.style.use('seaborn-darkgrid')
     plt.rc('patch', force_edgecolor=True,edgecolor='black')
     plt.rc('hist', bins='auto')
-    style.use('seaborn-darkgrid')
     sns.set_context('notebook')
     sns.set_palette('gist_heat')
     st.set_page_config(layout='wide')
@@ -58,9 +54,8 @@ def main():
         chart1 = data
         chart2 = data.rolling(window = 12).mean().dropna()
         chart3 = data.rolling(window = 12).std().dropna()
-        # %%
+
         df = pd.concat([chart1, chart2, chart3], axis=1)
-        # %%
         df.columns=['Close', 'Rolling Mean', 'Rolling Std']
 
         st.title('Rolling value decomposition on Apple stock')
@@ -86,10 +81,6 @@ def main():
 
     st.plotly_chart(fig, key="seaborn-darkgrid")
     # %%
-    fig = mplot.plot_arima(thin_data, 'Close')
-    
-    st.pyplot(fig)
-    # %%
     decomp = sm.tsa.seasonal_decompose(thin_data['Close'], model='additive', extrapolate_trend='freq', period=6)
     fig, axes = plt.subplots(4, 1, figsize=(17, 12))
     axes[0].plot(thin_data['Close'])
@@ -99,7 +90,8 @@ def main():
     
     st.pyplot(fig)
     # %%
-    
+    fig = mplot.plot_arima(thin_data, 'Close')
+    st.pyplot(fig)
 # %%
 if __name__ == '__main__':
     main()    
