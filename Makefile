@@ -1,9 +1,9 @@
-OWNER := cogentdom
-IMAGE_NAME := dashboard#python
-VERSION := v0#ubuntu
-REPOSITORY := mounting_containers
-IMAGE_ID := 1554742b4968#d94e96d264e7
-REGISTRY := chiefdom
+OWNER :=cogentdom
+IMAGE_NAME :=dashboard
+VERSION :=v0
+REPOSITORY :=mounting_containers
+IMAGE_ID :=1554742b4968
+REGISTRY :=chiefdom
 
 default: 
 	@echo 'Specify target'
@@ -40,5 +40,5 @@ build_git: ## Build the container forrmated for githubs api
 # release_git: tag_git build_git publish_git ## Make a release by building and publishing tagged image to Docker Trusted Registry (DTR)
 
 publish_git: ## Publish image to DTR
-	@echo 'publish $(REGISTRY)/$(IMAGE_NAME):$(VERSION)'
+#	@echo 'publish $(REGISTRY)/$(IMAGE_NAME):$(VERSION)'
 	docker push docker.pkg.github.com/$(OWNER)/$(REPOSITORY)/$(IMAGE_NAME):$(VERSION)
