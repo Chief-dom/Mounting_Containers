@@ -4,10 +4,10 @@ FROM ubuntu:20.04
 RUN apt update && apt -y upgrade
 RUN apt install -y python3-pip
 
-WORKDIR /opt
+WORKDIR /opt/
 COPY requirements.txt .
 RUN mkdir .streamlit
-COPY .streamlit/config.toml .streamlit/config.toml
+COPY .streamlit/config.toml .streamlit/
 COPY datamover.py .
 COPY main.py .
 
