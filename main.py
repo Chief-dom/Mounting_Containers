@@ -33,8 +33,6 @@ def main():
     sns.set_context('notebook')
     sns.set_palette('gist_heat')
     st.set_page_config(layout='wide')
-
-    # st.set_option('deprecation.showPyplotGlobalUse', False)
     # %%
     today = date.today().strftime("%Y-%m-%d")
     mover = DataMover("2018-04-26", today)
@@ -48,12 +46,8 @@ def main():
     date_index = list(datetime_range(start=datetime(2018, 4, 26), end=datetime(2021, 4, 26)))
     # %%
     data.Date = pd.to_datetime(data.Date)
-    # date_index = pd.DataFrame(date_index)
-    # date_index= date_index.rename(columns= {0:"dates"})
     data.set_index('Date', inplace=True)
     data.sort_index(inplace=True, ascending=True)
-    # %%
-    # thin_data
     # %%
     thin_data = data.resample('2w').mean()
     # %%
@@ -92,19 +86,20 @@ def main():
 
     st.plotly_chart(fig, key="seaborn-darkgrid")
     # %%
-    # mplot.plot_arima(thin_data, 'Close')
-   
-    # %%
-    # fig = plt.figure()
-    # decomposition = sm.tsa.seasonal_decompose(thin_data['Close'], model='additive', extrapolate_trend='freq', period=6)
-    # decomposition.plot()
     fig = mplot.plot_arima(thin_data, 'Close')
+    
     st.pyplot(fig)
-
     # %%
-    # decomposition = sm.tsa.seasonal_decompose(thin_data['Close'], model='additive', extrapolate_trend='freq', period=6)
-    # fig = plt.plot(decomposition.trend)
-    # st.pyplot(fig)
+    decomp = sm.tsa.seasonal_decompose(thin_data['Close'], model='additive', extrapolate_trend='freq', period=6)
+    fig, axes = plt.subplots(4, 1, figsize=(17, 12))
+    axes[0].plot(thin_data['Close'])
+    axes[1].plot(decomp.trend)
+    axes[2].plot(decomp.seasonal)
+    axes[3].scatter(thin_data.index.values, decomp.resid)
+    
+    st.pyplot(fig)
+    # %%
+    
 # %%
 if __name__ == '__main__':
     main()    

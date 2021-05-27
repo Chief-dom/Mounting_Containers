@@ -7,6 +7,8 @@ RUN apt install -y python3-pip
 WORKDIR /opt
 COPY requirements.txt .
 COPY .streamlit .
+COPY datamover.py .
+COPY main.py .
 
 RUN pip3 install -r requirements.txt
 EXPOSE 8501
