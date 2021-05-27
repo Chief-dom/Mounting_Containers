@@ -10,7 +10,7 @@ default:
 
 new: build_new
 git: tag_git build_git publish_git
-drhub: build_drhuh publish_drhuh
+drhub: build_drhub publish_drhub
 
 all: git drhub
 
@@ -20,12 +20,12 @@ build_new: ## Build the container without caching
 
 
 # ------ Dockhub build ------
-build_drhuh: ## Build the container without caching
+build_drhub: ## Build the container without caching
 	docker build -t $(REGISTRY)/$(IMAGE_NAME):$(VERSION) .
 
 # release_dh:  ## Make a release by building and publishing tagged image to Docker Trusted Registry (DTR)
 
-publish_drhuh: ## Publish image to DTR
+publish_drhub: ## Publish image to DTR
 	@echo 'publish $(REGISTRY)$(IMAGE_NAME):$(VERSION)'
 	docker push $(REGISTRY)/$(IMAGE_NAME):$(VERSION)
 
