@@ -2,7 +2,7 @@ OWNER :=cogentdom
 IMAGE_NAME :=dashboard
 VERSION :=v0
 REPOSITORY :=mounting_containers
-IMAGE_ID :=1b36367dbbf2
+IMAGE_ID :=ca2aee6d2dee
 REGISTRY :=chiefdom
 
 default: 
