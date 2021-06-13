@@ -14,5 +14,6 @@ COPY datamover.py .
 COPY main.py .
 
 EXPOSE 8501
+EXPOSE 80
 ENTRYPOINT ["streamlit", "run"]
 CMD ["main.py"]
